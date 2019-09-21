@@ -20,7 +20,7 @@
 
     </div>
 
-    <img src="https://vuefire.vuejs.org/firebase-logo.svg">
+    <img src="https://vuefire.vuejs.org/firebase-logo.svg" style="width: 6%;">
     <router-view/>
   </div>
 </template>
@@ -60,5 +60,16 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+.img-center {
+  display: block;
+  margin: auto;
+  padding: 5px;
+}
+.py-3p {
+  padding: 3px 0;
+}
+.my-3p {
+  margin: 3px 0;
 }
 </style>
