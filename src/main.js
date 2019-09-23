@@ -4,6 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import firebase from 'firebase'
+import VueLoading from 'vuejs-loading-plugin'
+
+Vue.use(VueLoading)
 
 Vue.config.productionTip = false
 

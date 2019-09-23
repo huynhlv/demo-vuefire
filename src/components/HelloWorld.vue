@@ -9,17 +9,16 @@
               placeholder="Name movie"
               type="text"
               v-model="movie"
-              @keyup.enter="addMovie"
               class="form-control"
             />
           </div>
-          <div class="row py-3p" style="position: relative;">
+          <div class="row py-3p p-relative">
             <button class="col-lg-2 btn btn-default btn-sm" @click="onPickFile">Choose Image</button>
-            <div class="col-lg-12" style="position: absolute; z-index: -1">
+            <div class="col-lg-12 show-img">
               <img v-if="image" :src="image" height="100"/>
             </div>
           </div>
-          <button class="btn btn-primary btn-sm" style="margin-top: 70px" @click="addMovie">Save</button>
+          <button class="btn btn-primary btn-sm" style="margin-top: 105px" @click="addMovie">Save</button>
           <input type="file" @change="onFilePicked($event, true)" style="display: none;" ref="fileInput" accept="image/*">
           <ul>
             <input type="file" @change="onFilePicked($event, false)" style="display: none;" ref="fileInputEdit" accept="image/*">
@@ -86,6 +85,7 @@ export default {
       fileReader.readAsDataURL(files[0])
     },
     addMovie() {
+      this.$loading(true)
       let key
       let imageUrl
       firebase
@@ -112,30 +112,40 @@ export default {
           this.movie = null
           this.image = null
           this.imgData = null
+          this.$loading(false)
         })
     },
 
     editMovie(key) {
-      let imageUrl
-      const filename = this.imgData.name
-      const ext = filename.slice(filename.lastIndexOf('.'))
-      firebase.storage().ref('/movies/' + key + ext).put(this.imgData)
-      .then(fileData => {
-        imageUrl = fileData.metadata.downloadURLs[0]
-        return firebase
-        .database()
-        .ref("movies")
-        .child(key)
-        .update({
-          name: this.editingMovie[key],
-          image: imageUrl
+      this.$loading(true)
+      if(!this.imgData) {
+        return firebase.database().ref("movies").child(key).update({
+          name: this.editingMovie[key]
+        }).then(data => {
+          this.editingMovie[key] = null
+          this.editFormMode = []
+          this.$loading(false)
         })
-      })
-      .then(data => {
-        this.editingMovie[key] = null;
-        this.editFormMode = [];
-        this.imgData = null
-      });
+      }else{
+        let imageUrl
+        const filename = this.imgData.name
+        const ext = filename.slice(filename.lastIndexOf('.'))
+        firebase.storage().ref('/movies/' + key + ext).put(this.imgData)
+        .then(fileData => {
+          fileData.ref.getDownloadURL().then(imageUrl => {
+            return firebase.database().ref("movies").child(key).update({
+              name: this.editingMovie[key],
+              image: imageUrl
+            })
+          })
+          .then(data => {
+            this.editingMovie[key] = null
+            this.editFormMode = []
+            this.imgData = null
+            this.$loading(false)
+          })
+        })
+      }
     },
 
     deleteMovie(key) {

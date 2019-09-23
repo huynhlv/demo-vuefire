@@ -20,7 +20,7 @@
 
     </div>
 
-    <img src="https://vuefire.vuejs.org/firebase-logo.svg" style="width: 6%;">
+    <img src="https://images.g2crowd.com/uploads/product/image/large_detail/large_detail_0016c93c710cf35990b999cba3a59bae/firebase.png" style="width: 6%;">
     <router-view/>
   </div>
 </template>
@@ -71,5 +71,12 @@ export default {
 }
 .my-3p {
   margin: 3px 0;
+}
+.show-img {
+  position: absolute;
+  z-index: -1;
+}
+.p-relative {
+  position: relative;
 }
 </style>
