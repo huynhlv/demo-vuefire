@@ -86,34 +86,24 @@ export default {
     },
     addMovie() {
       this.$loading(true)
-      let key
-      let imageUrl
-      firebase
-        .database()
-        .ref("movies")
-        .push({
-          name: this.movie
-        })
-        .then((data => {
-          key = data.key
-          return key
-        }))
-        .then(key => {
-          const filename = this.imgData.name
-          const ext = filename.slice(filename.lastIndexOf('.'))
-          return firebase.storage().ref('movies/' + key + ext).put(this.imgData)
-        })
-        .then(fileData => {
-          fileData.ref.getDownloadURL().then(imageUrl => {
-            return firebase.database().ref('movies').child(key).update({image: imageUrl})
+      const filename = this.imgData.name
+      const ext = filename.slice(filename.lastIndexOf('.'))
+      let newKey = firebase.database().ref().child('movies').push().key
+      firebase.storage().ref('movies/' + newKey + ext).put(this.imgData)
+      .then(fileData => {
+        fileData.ref.getDownloadURL().then(imageUrl => {
+          return firebase.database().ref('movies').child(newKey).update({
+            image: imageUrl,
+            name: this.movie
           })
         })
-        .then(data => {
-          this.movie = null
-          this.image = null
-          this.imgData = null
-          this.$loading(false)
-        })
+      })
+      .then(data => {
+        this.movie = null
+        this.image = null
+        this.imgData = null
+        this.$loading(false)
+      })
     },
 
     editMovie(key) {
@@ -127,7 +117,6 @@ export default {
           this.$loading(false)
         })
       }else{
-        let imageUrl
         const filename = this.imgData.name
         const ext = filename.slice(filename.lastIndexOf('.'))
         firebase.storage().ref('/movies/' + key + ext).put(this.imgData)
